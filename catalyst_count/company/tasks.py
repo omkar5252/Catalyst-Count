@@ -3,7 +3,7 @@ import csv
 from django.core.exceptions import ValidationError
 from catalyst_count.company.models import Company
 
-@shared_task(bind=True)
+@shared_task(bind=True, soft_time_limit=3600)
 def process_csv(self, file_path):
     """
     Asynchronously processes the uploaded CSV file and saves the data to the database.
@@ -13,7 +13,6 @@ def process_csv(self, file_path):
         with open(file_path, "r") as csvfile:
             reader = csv.DictReader(csvfile)
             companies = []
-            print(reader, '----------reader-----------------------')
 
             for row in reader:
                 # Prepare company data from the CSV row with checks for missing fields
@@ -48,7 +47,6 @@ def process_csv(self, file_path):
                 else:
                     print(f"Skipping duplicate company: {company_data['name']}")
 
-            print(companies, '------companies-----------------------')
             # Bulk create companies in the database
             if companies:
                 Company.objects.bulk_create(companies)

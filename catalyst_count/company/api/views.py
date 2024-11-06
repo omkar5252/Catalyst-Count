@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 
+from catalyst_count.company.api.filters import CompanyFilter
 from catalyst_count.company.models import Company
 from catalyst_count.company.tasks import process_csv
 from .serializers import CSVUploadSerializer, CompanySerializer
@@ -13,6 +14,7 @@ from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateMode
 class CompanyViewSet(viewsets.GenericViewSet, ListModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
+    filterset_class = CompanyFilter
 
     def get_serializer_class(self):
         # Return different serializers based on the action
@@ -36,7 +38,7 @@ class CompanyViewSet(viewsets.GenericViewSet, ListModelMixin, RetrieveModelMixin
 
             return Response(
                 {"message": "File uploaded successfully. Processing started."},
-                status=status.HTTP_202_ACCEPTED,
+                status=status.HTTP_200_OK,
             )
         else:
             return Response(
