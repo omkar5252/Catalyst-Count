@@ -1,0 +1,16 @@
+services:
+  docs:
+    image: catalyst_count_local_docs
+    container_name: catalyst_count_local_docs
+    build:
+      context: .
+      dockerfile: ./compose/local/docs/Dockerfile
+    env_file:
+      - ./.envs/.local/.django
+    volumes:
+      - ./docs:/docs:z
+      - ./config:/app/config:z
+      - ./catalyst_count:/app/catalyst_count:z
+    ports:
+      - '9000:9000'
+    command: /start-docs

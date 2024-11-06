@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=catalyst_count
+POSTGRES_USER=YoRWnaRFiZNqSDsyQXwODbARzgYMNxqA
+POSTGRES_PASSWORD=LKorMXvNRGoujR3kwYyWEurNdaNAKd3ZliTschqno70gJ5SL6fpHUGZLmif0QCHh
