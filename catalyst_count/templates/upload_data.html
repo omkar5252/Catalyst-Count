@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block title %}Upload Data{% endblock %}
@@ -19,7 +18,13 @@
 
           <!-- Upload button with Bootstrap styling -->
           <div class="d-grid gap-2">
-            <button type="button" class="btn btn-primary" onclick="uploadData()">Upload</button>
+            {% if user.is_authenticated %}
+              <!-- Enable the upload button if user is authenticated -->
+              <button type="button" class="btn btn-primary" onclick="uploadData()">Upload</button>
+            {% else %}
+              <!-- Disable the upload button if user is not authenticated -->
+              <button type="button" class="btn btn-primary" disabled>Upload</button>
+            {% endif %}
           </div>
         </form>
 
@@ -57,7 +62,7 @@
           fileInput.value = '';
 
           // Display success message
-          document.getElementById('messageBox').innerHTML = `
+          document.getElementById('messageBox').innerHTML = ` 
             <div class="alert alert-success" role="alert">
               File uploaded successfully!
             </div>
