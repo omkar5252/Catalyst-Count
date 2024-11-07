@@ -69,5 +69,5 @@ CELERY_TASK_EAGER_PROPAGATES = True
 # Your stuff...
 # ------------------------------------------------------------------------------
 
-EMAIL_HOST = "mailhog"
+EMAIL_HOST = "maipit"
 EMAIL_PORT = 1025
