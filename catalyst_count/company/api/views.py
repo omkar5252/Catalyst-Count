@@ -6,7 +6,6 @@ from catalyst_count.company.tasks import process_csv
 from .serializers import CSVUploadSerializer, CompanySerializer
 from rest_framework import status, viewsets
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser
 from django.core.files.storage import FileSystemStorage
 from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin

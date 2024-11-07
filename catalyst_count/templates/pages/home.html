@@ -1,3 +1,200 @@
 {% extends "base.html" %}
 
+{% block title %}Home{% endblock %}
 
+{% block content %}
+  <h1>Companies</h1>
+
+  <!-- Filter Form -->
+  <form id="filterForm">
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label for="name" class="form-label">Company Name</label>
+        <input type="text" id="name" class="form-control" placeholder="Search by name">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label for="industry" class="form-label">Industry</label>
+        <input type="text" id="industry" class="form-control" placeholder="Search by industry">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label for="domain" class="form-label">Domain</label>
+        <input type="text" id="domain" class="form-control" placeholder="Search by domain">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label for="country" class="form-label">Country</label>
+        <input type="text" id="country" class="form-control" placeholder="Search by country">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label for="year_founded" class="form-label">Year Founded</label>
+        <input type="text" id="year_founded" class="form-control" placeholder="Search by year founded">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label for="size_range" class="form-label">Size Range</label>
+        <input type="text" id="size_range" class="form-control" placeholder="Search by size range">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label for="current_employee_estimate" class="form-label">Current Employee Estimate</label>
+        <input type="text" id="current_employee_estimate" class="form-control" placeholder="Search by current employee">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label for="total_employee_estimate" class="form-label">Total Employee Estimate</label>
+        <input type="text" id="total_employee_estimate" class="form-control" placeholder="Search by total employee">
+      </div>
+      <div class="col-md-4 mb-3">
+        <!-- Empty div to balance the last column -->
+      </div>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+  </form>
+
+  <!-- Companies Table -->
+  <h2>Filtered Companies</h2>
+  <table class="table table-striped" id="companiesTable" style="display: none;">
+    <thead id="tableHeader">
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Name</th>
+        <th scope="col">Domain</th>
+        <th scope="col">Year Founded</th>
+        <th scope="col">Industry</th>
+        <th scope="col">Size Range</th>
+        <th scope="col">Locality</th>
+        <th scope="col">Country</th>
+        <th scope="col">LinkedIn</th>
+        <th scope="col">Current Employees</th>
+        <th scope="col">Total Employees</th>
+      </tr>
+    </thead>
+    <tbody id="companiesList">
+      <!-- Company rows will be dynamically inserted here -->
+    </tbody>
+  </table>
+
+  <!-- Pagination Controls -->
+  <div id="paginationControls" style="display: none;">
+    <span id="pageInfo"></span>
+    <button id="prevPage" class="btn btn-secondary" onclick="loadPage('previous')">Previous</button>
+    <button id="nextPage" class="btn btn-secondary" onclick="loadPage('next')">Next</button>
+  </div>
+
+  <script>
+    let currentPage = 1;  // Track current page
+    let currentPageUrl = '/api/companies/';  // Initial URL
+    let totalCompanies = 0;
+
+    async function applyFilters() {
+      const accessToken = localStorage.getItem('access');
+      if (!accessToken) {
+        alert('You need to log in first.');
+        return;
+      }
+
+      const name = document.getElementById('name').value;
+      const industry = document.getElementById('industry').value;
+      const domain = document.getElementById('domain').value;
+      const country = document.getElementById('country').value;
+      const year_founded = document.getElementById('year_founded').value;
+      const size_range = document.getElementById('size_range').value;
+      const current_employee_estimate = document.getElementById('current_employee_estimate').value;
+      const total_employee_estimate = document.getElementById('total_employee_estimate').value;
+
+      const queryParams = new URLSearchParams();
+      if (name) queryParams.append('name', name);
+      if (industry) queryParams.append('industry', industry);
+      if (domain) queryParams.append('domain', domain);
+      if (country) queryParams.append('country', country);
+      if (year_founded) queryParams.append('year_founded', year_founded);
+      if (size_range) queryParams.append('size_range', size_range);
+      if (current_employee_estimate) queryParams.append('current_employee_estimate', current_employee_estimate);
+      if (total_employee_estimate) queryParams.append('total_employee_estimate', total_employee_estimate);
+
+      currentPageUrl = `/api/companies/?${queryParams.toString()}`; // Update the URL with filters
+      currentPage = 1; 
+      loadPage();
+    }
+
+    async function loadPage(direction = '') {
+      const accessToken = localStorage.getItem('access');
+      if (!accessToken) {
+        alert('You need to log in first.');
+        return;
+      }
+
+      let url = currentPageUrl;
+
+      // Adjust the URL to go to next or previous page based on direction
+      if (direction === 'next') {
+        currentPage += 1;
+        url = `${currentPageUrl}&page=${currentPage}`;
+      } else if (direction === 'previous') {
+        currentPage -= 1;
+        url = `${currentPageUrl}&page=${currentPage}`;
+      } else {
+        // First page or after filter
+        url = `${currentPageUrl}&page=1`;
+      }
+
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          const companiesList = document.getElementById('companiesList');
+          const tableHeader = document.getElementById('tableHeader');
+          companiesList.innerHTML = '';  // Clear existing list
+
+          totalCompanies = data.count;  // Total number of companies
+
+          if (data.results.length > 0) {
+            tableHeader.style.display = 'table-header-group';  // Show table headers
+            data.results.forEach(company => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td>${company.id}</td>
+                <td>${company.name}</td>
+                <td>${company.domain}</td>
+                <td>${company.year_founded}</td>
+                <td>${company.industry}</td>
+                <td>${company.size_range}</td>
+                <td>${company.locality}</td>
+                <td>${company.country}</td>
+                <td><a href="https://${company.linkedin_url}" target="_blank">${company.linkedin_url}</a></td>
+                <td>${company.current_employee_estimate}</td>
+                <td>${company.total_employee_estimate}</td>
+              `;
+              companiesList.appendChild(row);
+            });
+
+            document.getElementById('companiesTable').style.display = 'table';  // Show the table after filtering
+
+            // Update pagination controls
+            document.getElementById('paginationControls').style.display = 'block';  // Show pagination controls
+            document.getElementById('pageInfo').textContent = `Page: ${currentPage} of ${Math.ceil(totalCompanies / data.results.length)}`;
+            document.getElementById('prevPage').disabled = !data.previous;
+            document.getElementById('nextPage').disabled = !data.next;
+          } else {
+            alert('No companies found matching the filters');
+            document.getElementById('companiesTable').style.display = 'none';  // Hide table if no data found
+            document.getElementById('paginationControls').style.display = 'none';  // Hide pagination controls
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching companies:', error);
+        alert('Error fetching companies');
+      }
+    }
+
+    // Load the initial page of data
+    loadPage();
+  </script>
+{% endblock %}

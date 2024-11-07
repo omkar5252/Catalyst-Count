@@ -75,7 +75,7 @@
               <a class="nav-link" href="{% url 'home' %}">Home <span class="visually-hidden">(current)</span></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'about' %}">About</a>
+              <a class="nav-link" href="{% url 'api:upload_data' %}">Upload Data</a>
             </li>
             {% if request.user.is_authenticated %}
               <li class="nav-item">
@@ -94,8 +94,7 @@
                 </li>
               {% endif %}
               <li class="nav-item">
-                {# URL provided by django-allauth/account/urls.py #}
-                <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% translate "Sign In" %}</a>
+                <a id="log-in-link" class="nav-link" href="{% url 'api:login' %}">{% translate "Sign In" %}</a>
               </li>
             {% endif %}
           </ul>
