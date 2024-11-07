@@ -13,6 +13,7 @@ services:
     depends_on:
       - postgres
       - redis
+      - mailpit
     volumes:
       - .:/app:z
     env_file:
@@ -40,32 +41,10 @@ services:
     
     volumes:
       - catalyst_count_local_redis_data:/data
-    
-
-  celeryworker:
-    <<: *django
-    image: catalyst_count_local_celeryworker
-    container_name: catalyst_count_local_celeryworker
-    depends_on:
-      - redis
-      - postgres
-    ports: []
-    command: /start-celeryworker
-
-  celerybeat:
-    <<: *django
-    image: catalyst_count_local_celerybeat
-    container_name: catalyst_count_local_celerybeat
-    depends_on:
-      - redis
-      - postgres
-    ports: []
-    command: /start-celerybeat
-
-  flower:
-    <<: *django
-    image: catalyst_count_local_flower
-    container_name: catalyst_count_local_flower
+  
+  mailpit:
+    image: docker.io/axllent/mailpit:latest
+    container_name: flightdeck_local_mailpit
     ports:
-      - '5555:5555'
-    command: /start-flower
+      - "1025:1025"
+      - "8025:8025"

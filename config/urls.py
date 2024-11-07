@@ -13,6 +13,8 @@ from rest_framework.authtoken.views import obtain_auth_token
 from dj_rest_auth.views import PasswordResetView, PasswordResetConfirmView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+from catalyst_count.users.api.views import CustomRegisterView
+
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path(
@@ -39,10 +41,7 @@ urlpatterns += [
     # API base url
     path("api/", include("config.api_router")),
     # DRF auth token
-    path(
-        "api/auth/register/",
-        include("dj_rest_auth.registration.urls"),
-    ),
+    path('api/auth/register/', CustomRegisterView.as_view()),
     path(
         "api/auth/password/reset/confirm/<uidb64>/<token>/",
         PasswordResetConfirmView.as_view(),

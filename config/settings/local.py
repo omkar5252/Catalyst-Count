@@ -68,3 +68,6 @@ INSTALLED_APPS += ["django_extensions"]
 CELERY_TASK_EAGER_PROPAGATES = True
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+EMAIL_HOST = "mailhog"
+EMAIL_PORT = 1025

@@ -9,6 +9,8 @@ from rest_framework.viewsets import GenericViewSet
 from catalyst_count.users.models import User
 
 from .serializers import UserSerializer
+from django.db import IntegrityError
+from dj_rest_auth.registration.views import RegisterView
 
 
 class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericViewSet):
@@ -24,3 +26,10 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
     def me(self, request):
         serializer = UserSerializer(request.user, context={"request": request})
         return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+class CustomRegisterView(RegisterView):
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except IntegrityError:
+            return Response({"error": "A user with this email already exists."}, status=status.HTTP_400_BAD_REQUEST)
