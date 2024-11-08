@@ -5,7 +5,6 @@
 {% block content %}
   <h1>Companies</h1>
 
-  <!-- Filter Form -->
   <form id="filterForm">
     <div class="row">
       <div class="col-md-4 mb-3">
@@ -45,20 +44,16 @@
         <input type="text" id="total_employee_estimate" class="form-control" placeholder="Search by total employee">
       </div>
       <div class="col-md-4 mb-3">
-        <!-- Empty div to balance the last column -->
       </div>
     </div>
 
     {% if user.is_authenticated %}
-      <!-- Enable the button if user is authenticated -->
       <button type="button" class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
     {% else %}
-      <!-- Disable the button if user is not authenticated -->
       <button type="button" class="btn btn-primary" disabled>Apply Filters</button>
     {% endif %}
   </form>
 
-  <!-- Companies Table -->
   <h2>Filtered Companies</h2>
   <table class="table table-striped" id="companiesTable" style="display: none;">
     <thead id="tableHeader">
@@ -77,11 +72,9 @@
       </tr>
     </thead>
     <tbody id="companiesList">
-      <!-- Company rows will be dynamically inserted here -->
     </tbody>
   </table>
 
-  <!-- Pagination Controls -->
   <div id="paginationControls" style="display: none;">
     <span id="pageInfo"></span>
     <button id="prevPage" class="btn btn-secondary" onclick="loadPage('previous')">Previous</button>
@@ -89,8 +82,8 @@
   </div>
 
   <script>
-    let currentPage = 1;  // Track current page
-    let currentPageUrl = '/api/companies/';  // Initial URL
+    let currentPage = 1;
+    let currentPageUrl = '/api/companies/';
     let totalCompanies = 0;
 
     async function applyFilters() {
@@ -119,7 +112,7 @@
       if (current_employee_estimate) queryParams.append('current_employee_estimate', current_employee_estimate);
       if (total_employee_estimate) queryParams.append('total_employee_estimate', total_employee_estimate);
 
-      currentPageUrl = `/api/companies/?${queryParams.toString()}`; // Update the URL with filters
+      currentPageUrl = `/api/companies/?${queryParams.toString()}`;
       currentPage = 1; 
       loadPage();
     }
@@ -133,7 +126,6 @@
 
       let url = currentPageUrl;
 
-      // Adjust the URL to go to next or previous page based on direction
       if (direction === 'next') {
         currentPage += 1;
         url = `${currentPageUrl}&page=${currentPage}`;
@@ -141,7 +133,6 @@
         currentPage -= 1;
         url = `${currentPageUrl}&page=${currentPage}`;
       } else {
-        // First page or after filter
         url = `${currentPageUrl}&page=1`;
       }
 
@@ -158,12 +149,12 @@
         if (response.ok) {
           const companiesList = document.getElementById('companiesList');
           const tableHeader = document.getElementById('tableHeader');
-          companiesList.innerHTML = '';  // Clear existing list
+          companiesList.innerHTML = '';
 
-          totalCompanies = data.count;  // Total number of companies
+          totalCompanies = data.count;
 
           if (data.results.length > 0) {
-            tableHeader.style.display = 'table-header-group';  // Show table headers
+            tableHeader.style.display = 'table-header-group';
             data.results.forEach(company => {
               const row = document.createElement('tr');
               row.innerHTML = `
@@ -182,16 +173,15 @@
               companiesList.appendChild(row);
             });
 
-            document.getElementById('companiesTable').style.display = 'table';  // Show the table after filtering
+            document.getElementById('companiesTable').style.display = 'table';
 
-            // Update pagination controls
-            document.getElementById('paginationControls').style.display = 'block';  // Show pagination controls
+            document.getElementById('paginationControls').style.display = 'block';
             document.getElementById('pageInfo').textContent = `Page: ${currentPage} of ${Math.ceil(totalCompanies / data.results.length)}`;
             document.getElementById('prevPage').disabled = !data.previous;
             document.getElementById('nextPage').disabled = !data.next;
           } else {
             alert('No companies found matching the filters');
-            document.getElementById('companiesTable').style.display = 'none';  // Hide the table if no companies found
+            document.getElementById('companiesTable').style.display = 'none';
           }
         } else {
           alert('Failed to fetch companies data');

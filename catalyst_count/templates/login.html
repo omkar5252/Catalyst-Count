@@ -39,7 +39,6 @@
         const data = await response.json();
 
         if (response.ok) {
-          // Store tokens in local storage or cookies
           localStorage.setItem('access', data.access);
           localStorage.setItem('refresh', data.refresh);
           alert('Logged in successfully');
