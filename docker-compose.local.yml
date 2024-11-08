@@ -1,3 +1,7 @@
+networks:
+  catalyst_network:
+    driver: bridge
+
 volumes:
   catalyst_count_local_postgres_data: {}
   catalyst_count_local_postgres_data_backups: {}
@@ -22,6 +26,8 @@ services:
     ports:
       - '8000:8000'
     command: /start
+    networks:
+      - catalyst_network
 
   postgres:
     build:
@@ -34,6 +40,8 @@ services:
       - catalyst_count_local_postgres_data_backups:/backups
     env_file:
       - ./.envs/.local/.postgres
+    networks:
+      - catalyst_network
 
   redis:
     image: docker.io/redis:6
@@ -41,13 +49,17 @@ services:
     
     volumes:
       - catalyst_count_local_redis_data:/data
+    networks:
+      - catalyst_network
   
   mailpit:
     image: docker.io/axllent/mailpit:latest
-    container_name: flightdeck_local_mailpit
+    container_name: mailpit
     ports:
       - "1025:1025"
       - "8025:8025"
+    networks:
+      - catalyst_network
 
   celeryworker:
     <<: *django
@@ -58,6 +70,8 @@ services:
       - postgres
     ports: []
     command: /start-celeryworker
+    networks:
+      - catalyst_network
 
   celerybeat:
     <<: *django
@@ -68,6 +82,8 @@ services:
       - postgres
     ports: []
     command: /start-celerybeat
+    networks:
+      - catalyst_network
 
   flower:
     <<: *django
@@ -76,3 +92,5 @@ services:
     ports:
       - '5555:5555'
     command: /start-flower
+    networks:
+      - catalyst_network
